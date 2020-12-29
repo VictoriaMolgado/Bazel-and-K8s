@@ -1,19 +1,19 @@
 # Migrating our k8s infrastructure to a monorepo
 
-In VTEX, in the creation of our platform as a service, we've seen the necessity to implement a CI/CD pipeline in the cloud.
-We needed to create a pipeline integrated with GitHub that, every new commit, we'd be able to build the entire store and run some tests with it.
+At VTEX, when creating our platform as a service, we've seen the need to implement a CI/CD pipeline in the cloud.
+It was necessary to create a code pipeline integrated with GitHub that, after every new commit, we'd be able to build the entire store and run some tests with it.
 
-To build such infrastructure, we decided to use [Kubernetes](https://kubernetes.io). Luckly, [Tekton CD](https://tekton.dev) is a open-source framework for creating CI/CD pipelines built for K8s. We started using it as well, but this won't be the focus of this article.
+To build such infrastructure, we decided to use [Kubernetes](https://kubernetes.io). Luckly, [Tekton CD](https://tekton.dev) is a open-source framework for creating CI/CD pipelines built for K8s. So, we started using it as well as our infrastructure base.
 
-As we grew our code base for the platform, with multiple repositories involved, we've realized the importance of having a centralized structure where we could know everything that was in production.
+As we developed our plataform code base, with multiple repositories involved, we've realized the importance of having a centralized structure where we could know everything that was in production.
 
 But before I get to the monorepo itself, let me talk a little about our purpose building this platform, our challenges and some context that may be important for you to fully understand this article.
 
 ## 🏗 What we're building
 Our goal is to build a framework for building blazing fast stores.
-No surprise we choose to use [Gatsby](https://www.gatsbyjs.com) as our front-end generator.
+No surprise we choose to use [Gatsby](https://www.gatsbyjs.com) as our front-end generator — once it is [reference on this subject](https://www.freecodecamp.org/news/why-you-should-use-gatsbyjs-to-build-static-sites-4f90eb6d1a7b/).
 
-But to build e-commerce stores with Gatsby, we need to perform a lot of builds.
+But, to build ecommerce stores with Gatsby, we need to perform a lot of builds.
 Every change in the store must trigger a new build.
 To create the infrastructure that would process all of this builds, we've settled with Tekton CD running on a Kubernetes.
 
@@ -22,8 +22,9 @@ The code is analysed by [Sonarqube](https://www.sonarqube.org), we also run some
 
 As usual, we've also integrated everything with [GitHub](https://github.com), using the checks available for each commit.
 
+## What we didn't knew at the beggining 
 As you can imagine, we've created a lot of CRD's for our Kubernetes. As well as a lot of docker images that were used by our pods in each build step.
-As any project start, where we don't know yet all of the best practices that will take place once we start scaling the project, we just started the code putting all the `.yaml`'s of the CRD's in one repo, and each Docker image we generated had the source code in a diferente GitHub repository.
+As any project in the beggining, in that moment we don't know yet all of the best practices that will take place once we start scaling the project, we just started the code putting all the `.yaml`'s of the CRD's in one repo, and each Docker image we generated had the source code in a diferente GitHub repository.
 
 As the project grew, it became noticeable that it was not a good approach.
 Let's say we want to add a new build step to our pipeline with actions complex enough that we couldn't handle with only bash scripts or already existing Docker images.
@@ -32,7 +33,7 @@ After that, we could reference such image in our CRD's and apply them.
 
 ## 🧠🌩 Why monorepo?
 
-There is lot o manual work (build and push the new image, reference it with the right tag in the CRD) and some change of context (we're dealing with, at least, to repositories at the same time).
+There is lot o manual work (build and push the new image, reference it with the right tag in the CRD) and some change of context (we're dealing with, at least, two repositories at the same time).
 Not optimal for productivity.
 So we started to think about creating a monorepo with all the images, but soon we realized that we could also include all the CRD's in it too!
 
@@ -277,7 +278,7 @@ To test, run:
 ### Step 3: using image in CRD
 If you read the code of our image, you've seen that's a very simple REST API, that returns a `Hello, world!` when receiving a POST request.
 
-Now let's create a service to run on top of our Kubernetes. For this branch, I'vre reorganized the code: all the `.yaml`s with CRDs are in the `k8s` folder.
+Now let's create a service to run on top of our Kubernetes. For this branch, I've reorganized the code: all the `.yaml`s with CRDs are in the `k8s` folder.
 With that, we'll need to reorganize the `BUILD` files.
 But first, let's add our new service.
 
