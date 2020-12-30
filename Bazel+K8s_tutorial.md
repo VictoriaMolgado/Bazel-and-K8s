@@ -379,3 +379,5 @@ In summary, this was a highlight of our process of migrating to a monorepo and w
 Bazel simplified the interface for building the entire application.
 With that, we get closer to having a fully automized deploy system.
 One that gives us more confidence and gives us a better test hability to prevent errors in production.
+
+(ignore it)
